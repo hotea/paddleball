@@ -30,6 +30,8 @@ class Ball(object):
             self.hit_bottom = True
         if self.hit_paddle(pos):
             self.y = -3
+            self.x += paddle.x
+
     def hit_paddle(self, pos):
         paddle_pos = self.canvas.coords(self.paddle.id)
         if pos[0] <= paddle_pos[2] and pos[2] >= paddle_pos[0]:
@@ -41,11 +43,13 @@ class Paddle(object):
     def __init__(self, canvas, color):
         self.canvas = canvas
         self.id = canvas.create_rectangle(0, 0, 100, 10, fill=color)
-        self.canvas.move(self.id, 200, 300)
+        self.canvas.move(self.id, 200, 350)
         self.x = 0
         self.canvas_width = self.canvas.winfo_width()
         self.canvas.bind_all('<KeyPress-Left>', self.turn_left)
         self.canvas.bind_all('<KeyPress-Right>', self.turn_right)
+        self.canvas.bind_all('<Button-1>', self.start_game)
+        self.is_start = False
 
     def draw(self):
         self.canvas.move(self.id, self.x, 0)
@@ -64,6 +68,16 @@ class Paddle(object):
         if pos[2]+4 <= self.canvas_width:
             self.x = 4
 
+    def start_game(self, evt):
+        self.is_start = True
+
+class Gameover(object):
+    def __init__(self, canvas):
+        self.canvas = canvas
+#        self.hid = False
+        self.id = self.canvas.create_text(240, 350, text="You Died!", font=('Courier', 25), state='hidden')
+
+
 tk = Tk()
 tk.title("Game")
 tk.resizable(0, 0)
@@ -75,14 +89,17 @@ tk.update()
 
 paddle = Paddle(canvas, 'green')
 ball = Ball(canvas, paddle, 'blue')
+game_over = Gameover(canvas)
 
-time.sleep(1)
 while 1:
-    if ball.hit_bottom == False:
+    if ball.hit_bottom == False and paddle.is_start:
         ball.draw()
         paddle.draw()
     tk.update_idletasks()
     tk.update()
     time.sleep(0.01)
+    if ball.hit_bottom:
+        time.sleep(0.5)
+        canvas.itemconfig(game_over.id, state='normal')
 
 
