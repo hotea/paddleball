@@ -15,6 +15,7 @@ class Ball(object):
         self.y = -3
         self.canvas_height = self.canvas.winfo_height()
         self.canvas_width = self.canvas.winfo_width()
+        self.hit_bottom = False
 
     def draw(self):
         self.canvas.move(self.id, self.x, self.y)
@@ -26,7 +27,7 @@ class Ball(object):
         if pos[1] < 0:
             self.y = 3
         if pos[3] > self.canvas_height:
-            self.y = -3
+            self.hit_bottom = True
         if self.hit_paddle(pos):
             self.y = -3
     def hit_paddle(self, pos):
@@ -75,9 +76,11 @@ tk.update()
 paddle = Paddle(canvas, 'green')
 ball = Ball(canvas, paddle, 'blue')
 
+time.sleep(1)
 while 1:
-    ball.draw()
-    paddle.draw()
+    if ball.hit_bottom == False:
+        ball.draw()
+        paddle.draw()
     tk.update_idletasks()
     tk.update()
     time.sleep(0.01)
