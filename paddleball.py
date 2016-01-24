@@ -4,8 +4,9 @@ import time
 
 
 class Ball(object):
-    def __init__(self, canvas, color):
+    def __init__(self, canvas, paddle, color):
         self.canvas = canvas
+        self.paddle = paddle
         self.id = canvas.create_oval(10, 10, 25, 25, fill=color)
         self.canvas.move(self.id, 245, 100)
         starts = [-3, -2, -1, 1, 2, 3]
@@ -26,6 +27,14 @@ class Ball(object):
             self.y = 3
         if pos[3] > self.canvas_height:
             self.y = -3
+        if self.hit_paddle(pos):
+            self.y = -3
+    def hit_paddle(self, pos):
+        paddle_pos = self.canvas.coords(self.paddle.id)
+        if pos[0] <= paddle_pos[2] and pos[2] >= paddle_pos[0]:
+            if pos[3] >= paddle_pos[1] and pos[3] <= paddle_pos[3]:
+                return True
+        return False
 
 class Paddle(object):
     def __init__(self, canvas, color):
@@ -46,9 +55,13 @@ class Paddle(object):
             self.x = 0
 
     def turn_left(self, evt):
-        self.x = -2
+        pos = self.canvas.coords(self.id) 
+        if pos[0]-4 >= 0:
+            self.x = -4
     def turn_right(self, evt):
-        self.x = 2
+        pos = self.canvas.coords(self.id) 
+        if pos[2]+4 <= self.canvas_width:
+            self.x = 4
 
 tk = Tk()
 tk.title("Game")
@@ -59,8 +72,8 @@ canvas.pack()
 tk.update()
 
 
-ball = Ball(canvas, 'blue')
 paddle = Paddle(canvas, 'green')
+ball = Ball(canvas, paddle, 'blue')
 
 while 1:
     ball.draw()
