@@ -1,2 +1,2 @@
 # paddleball
-- a ball game from the book <python for>
+- a ball game from the book "python for kids"
