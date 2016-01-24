@@ -4,9 +4,10 @@ import time
 
 
 class Ball(object):
-    def __init__(self, canvas, paddle, color):
+    def __init__(self, canvas, paddle, color, score):
         self.canvas = canvas
         self.paddle = paddle
+        self.score = score
         self.id = canvas.create_oval(10, 10, 25, 25, fill=color)
         self.canvas.move(self.id, 245, 100)
         starts = [-3, -2, -1, 1, 2, 3]
@@ -36,6 +37,7 @@ class Ball(object):
         paddle_pos = self.canvas.coords(self.paddle.id)
         if pos[0] <= paddle_pos[2] and pos[2] >= paddle_pos[0]:
             if pos[3] >= paddle_pos[1] and pos[3] <= paddle_pos[3]:
+                self.score.scores += 1
                 return True
         return False
 
@@ -74,8 +76,17 @@ class Paddle(object):
 class Gameover(object):
     def __init__(self, canvas):
         self.canvas = canvas
-#        self.hid = False
         self.id = self.canvas.create_text(240, 350, text="You Died!", font=('Courier', 25), state='hidden')
+
+class Score(object):
+    def __init__(self, canvas):
+        self.canvas = canvas
+        self.scores = 0
+        self.id = self.canvas.create_text(470, 10, text=self.scores, font=('Helvetica', 15), state='normal')
+    def draw(self):
+        canvas.itemconfig(self.id, text=self.scores)
+
+
 
 
 tk = Tk()
@@ -87,14 +98,16 @@ canvas.pack()
 tk.update()
 
 
+score = Score(canvas)
 paddle = Paddle(canvas, 'green')
-ball = Ball(canvas, paddle, 'blue')
+ball = Ball(canvas, paddle, 'blue',score)
 game_over = Gameover(canvas)
 
 while 1:
     if ball.hit_bottom == False and paddle.is_start:
         ball.draw()
         paddle.draw()
+        score.draw()
     tk.update_idletasks()
     tk.update()
     time.sleep(0.01)
